@@ -1,0 +1,142 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<script src="BubbleDialogEvents.js"></script>
+
+<dom-module id="bubble-dialog">
+    <template>
+        <style>
+            /* BUBBLE */
+            .bubble {
+                box-shadow: 0 1px 3px rgba(black,.2);
+                background-color: #fff;
+                border: 1px solid;
+                position: absolute;
+                z-index: 1201 !important;
+                border-color: #bbb #bbb #a8a8a8;
+                padding: 16px;
+                /*width: 255px;*/
+                line-height: 17px;
+                visibility: hidden; 
+                opacity: 0;
+                -moz-transition: all 0.218s;
+                -o-transition: all 0.218s;
+                -webkit-transition: all 0.218s;
+                transition: all 0.218s;
+            }
+
+            .bubble.active {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            /* bubble arrow */
+            .bubble-arrow {
+                position: absolute;
+                top: 20px;
+                width: 0; 
+                height: 0; 
+            }
+
+            /* La punta se obtiene por a X que se produce al intersectarse los bordes.
+               Dado que el DIV tiene tamaño 0, se usa la superposición de los bordes y su 
+               tamaño para obtener el triángulo deseado. 
+               Se le da color solo al borde desde el que sale el triángulo y los otros se ponen en
+               transparentes.
+               El width del borde que se ve determina el alto, mientras que la suma de los dos laterales 
+               determinan el ancho de la base.
+            */
+            .arrow-up {
+                
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+
+                border-bottom: 8px solid #fff;
+            }
+
+            .arrow-down {
+                width: 0; 
+                height: 0; 
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+
+                border-top: 8px solid #fff;
+            }
+
+            .arrow-right {
+                width: 0; 
+                height: 0; 
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+
+                border-left: 8px solid #fff;
+            }
+
+            .arrow-left {
+                width: 0; 
+                height: 0;
+                left: -16px;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent; 
+                
+                border-right: 20px solid #fff; 
+            }
+
+
+        </style> 
+
+        <div id="bubble" class="bubble active">
+            <div id="bubble-content"></div>
+            <div id="bubble-arrow" class="bubble-arrow arrow-left"></div>
+        </div>
+    </template>
+
+    <script>
+        /**
+         * `bubble-dialog`
+         * A BubbleDialog element
+         *
+         * @customElement
+         * @polymer
+         */
+        class BubbleDialog extends Polymer.Element {
+
+            static get is() {
+                return 'bubble-dialog';
+            }
+
+            static get properties() {
+                return {
+                    prop1: {
+                        type: String,
+                        value: 'bubble-dialog'
+                    },
+                    targetid: {
+                        type: String,
+                        value: ''
+                    }
+                };
+            }
+
+            updatePositionAndShow(targetid) {
+                //console.log("***************************************");
+                //console.log(this);
+                //var targetid = this.getProperty("targetid");
+
+                // 
+                console.log("Searching ", targetid, "...");
+                var rect = targetid.getBoundingClientRect();
+                console.log(rect.top, rect.right, rect.bottom, rect.left);
+
+                this.$server.targetPosition(rect.top, rect.right, rect.bottom, rect.left);
+            }
+
+            hideTimeout(bubble, timeout) {
+                setTimeout(function () {
+                    bubble.classList.remove("active");
+                }, 10000);
+            }
+
+        }
+
+        window.customElements.define(BubbleDialog.is, BubbleDialog);
+    </script>
+</dom-module>

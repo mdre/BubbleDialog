@@ -8,7 +8,7 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.HasTheme;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Tag("quick-popup")
-//@StyleSheet("frontend://bower_components/menubar/cards.css")
-@JsModule("./bubbledialgo/bubble-dialog.js")
+@Tag("bubble-dialog")
+//@StyleSheet("frontend://bower_components/bubbledialog/cards.css")
+@HtmlImport("bower_components/bubbledialog/bubble-dialog.html")
 public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements  HasSize, HasTheme, HasStyle, HasComponents {
 
     private final static Logger LOGGER = Logger.getLogger(BubbleDialog.class .getName());
@@ -30,6 +30,8 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
             LOGGER.setLevel(Level.FINER);
         }
     }
+    @Id("bubble")
+    Div bubble;
     
     @Id("bubble-content")
     Div bubbleContent;
@@ -38,6 +40,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     double top;
     double left;
     
+    int timeout;
     
     Element targetId;
     
@@ -58,14 +61,14 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      * track the visibility state off the component.
      */
     private boolean visibilityState = false;
-    private List<IBubbleDialogVisibilityEvent> visibilityEventListeners;
+    private List<IBubbleDialogVisibilityEvent> visibilityEventListeners = new ArrayList<>();;
     
     /**
      * the content to be shown
      */
     Component content;
     
-    // overlay utilziado para mostrar el QuickPopup
+    // overlay utilziado para mostrar el BubbleDialog
     BubbleDialogOverlay overlay;
     
     /**
@@ -89,8 +92,8 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     private void setPosition(double top, double left) {
         this.top = top;
         this.left = left;
-        bubbleContent.getStyle().set("top", ""+top+"px");
-        bubbleContent.getStyle().set("left", ""+left+"px");
+        bubble.getStyle().set("top", ""+top+"px");
+        bubble.getStyle().set("left", ""+left+"px");
     }
     
     /**
@@ -118,7 +121,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      */
     public void show() {
         LOGGER.log(Level.FINER, "llamando a updatePositionAndShow...");
-        UI.getCurrent().add(overlay);
+        UI.getCurrent().add(this);
         
         LOGGER.log(Level.FINER, "targetId: "+this.targetId);
         getElement().callFunction("updatePositionAndShow",this.targetId);
@@ -130,13 +133,14 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      * Hide the bubbleContent
      */
     public void hide() {
+        this.bubble.removeClassName("active");
         this.overlay.hide();
         this.fireVisibilityChangeEvent();
     }
     
     @ClientCallable
     private void targetPosition(double top, double right, double bottom, double left) {
-        LOGGER.log(Level.FINER, "showInternal!!!!");
+        LOGGER.log(Level.FINER, "top: "+top+" right: "+right+" bottom: "+bottom+" left: "+left);
         // agregar el overlay
         double popupTop = top;
         double popupLeft = right;
@@ -164,6 +168,30 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         }
         
         this.setPosition(popupTop,popupLeft);
+        this.bubble.addClassName("active");
+        
+        if (this.timeout>0) {
+            getElement().callFunction("hideTimeout",this.bubble,10000);
+        }
+    }
+    
+    /**
+     * Set the timeout in millis to automatic hide the bubble.
+     * Setting it to zero disable the effect. This is the default value;
+     * @param t in millis
+     * @return a self reference
+     */
+    public BubbleDialog setTimeout(int t) {
+        this.timeout = t;
+        return this;
+    }
+    
+    /**
+     * Return the current timeout.
+     * @return 
+     */
+    public int getTimeout() {
+        return this.timeout;
     }
     
     /**
@@ -206,15 +234,14 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         return bubbleContent.getStyle();
     }
     
+    
+    
     /**
      * Add a visibility change listener.
      * @param event listener
      * @return this
      */
     public BubbleDialog addVisibilityChangeListener(IBubbleDialogVisibilityEvent event) {
-        if (this.visibilityEventListeners == null) {
-            this.visibilityEventListeners = new ArrayList<>();
-        }
         this.visibilityEventListeners.add(event);
         return this;
     }
