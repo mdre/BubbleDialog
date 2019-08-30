@@ -36,11 +36,23 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     @Id("bubble-content")
     Div bubbleContent;
     
+    @Id("bubble-arrow")
+    Div bubbleArrow;
     
     double top;
     double left;
     
+    int bubblePadding = 2;
+    
     int timeout;
+    
+    int arrowLength = 8;
+    int arrowBaseWidth = 8;
+    double targetMiddle;
+    
+    int arrowWidth = 8;
+    int arrowHeight = 8;
+    
     
     Element targetId;
     
@@ -89,12 +101,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         this.overlay.addComponent(this);
     }
     
-    private void setPosition(double top, double left) {
-        this.top = top;
-        this.left = left;
-        bubble.getStyle().set("top", ""+top+"px");
-        bubble.getStyle().set("left", ""+left+"px");
-    }
+    
     
     /**
      * Set the bubbleContent content 
@@ -133,9 +140,25 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      * Hide the bubbleContent
      */
     public void hide() {
-        this.bubble.removeClassName("active");
-        this.overlay.hide();
+        LOGGER.log(Level.FINER, "hide bubble");
+        bubble.removeClassName("active");
+        //getElement().callFunction("hide");
+        this.visibilityState = false;
         this.fireVisibilityChangeEvent();
+    }
+    
+    /**
+     * Toggle the visibility state of the bubble
+     */
+    public void toggle() {
+        LOGGER.log(Level.FINER, "toggle visible");
+        if (this.isVisible()) {
+            LOGGER.log(Level.FINER, "hidding");
+            this.hide();
+        } else {
+            LOGGER.log(Level.FINER, "showing");
+            this.show();
+        }
     }
     
     @ClientCallable
@@ -148,12 +171,22 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         switch (this.alignTo) {
             case TOP_RIGHT:
                 popupTop = top + this.y_offset;
-                popupLeft = right + this.x_offset;
+                popupLeft = right + this.x_offset + this.arrowLength;
+                this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top;
+                
+                this.arrowHeight = this.arrowBaseWidth;
+                this.arrowWidth = this.arrowLength;
+                
+                bubbleArrow.getStyle().set("left","-"+(arrowLength+bubblePadding+1)+"px");
+                bubbleArrow.getStyle().set("top",""+targetMiddle+"px");
+                bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
+                bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
+                
                 break;
                 
             case BOTTOM_RIGHT:
                 popupTop = bottom + this.y_offset;
-                popupLeft = right + this.x_offset;
+                popupLeft = right + this.x_offset + this.arrowLength;
                 break;
                 
             case BOTTOM_LEFT:
@@ -167,12 +200,22 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
                 break;
         }
         
+        
         this.setPosition(popupTop,popupLeft);
         this.bubble.addClassName("active");
+        this.visibilityState = true;
         
         if (this.timeout>0) {
-            getElement().callFunction("hideTimeout",this.bubble,10000);
+            getElement().callFunction("hideTimeout",this.bubble,this.timeout);
         }
+    }
+    
+    private void setPosition(double top, double left) {
+        this.top = top;
+        this.left = left;
+        bubble.getStyle().set("top", ""+top+"px");
+        bubble.getStyle().set("left", ""+left+"px");
+        
     }
     
     /**
@@ -225,16 +268,32 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     }
     
     public boolean isVisible() {
-        return this.visibilityState;
+        LOGGER.log(Level.FINER, "active: " +this.bubble.getClassNames().contains("active"));
+        return this.bubble.getClassNames().contains("active");
     }
-    
+
+    public int getArrowLength() {
+        return arrowLength;
+    }
+
+    public BubbleDialog setArrowLength(int arrowLength) {
+        this.arrowLength = arrowLength;
+        return this;
+    }
+
+    public int getArrowBaseWidth() {
+        return arrowBaseWidth;
+    }
+
+    public BubbleDialog setArrowBaseWidth(int arrowBaseWidth) {
+        this.arrowBaseWidth = arrowBaseWidth;
+        return this;
+    }
     
     @Override
     public Style getStyle() {
         return bubbleContent.getStyle();
     }
-    
-    
     
     /**
      * Add a visibility change listener.

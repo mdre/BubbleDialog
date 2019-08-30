@@ -12,7 +12,7 @@
                 position: absolute;
                 z-index: 1201 !important;
                 border-color: #bbb #bbb #a8a8a8;
-                padding: 16px;
+                padding: 2px;
                 /*width: 255px;*/
                 line-height: 17px;
                 visibility: hidden; 
@@ -31,53 +31,45 @@
             /* bubble arrow */
             .bubble-arrow {
                 position: absolute;
-                top: 20px;
-                width: 0; 
-                height: 0; 
-            }
-
-            /* La punta se obtiene por a X que se produce al intersectarse los bordes.
-               Dado que el DIV tiene tamaño 0, se usa la superposición de los bordes y su 
-               tamaño para obtener el triángulo deseado. 
-               Se le da color solo al borde desde el que sale el triángulo y los otros se ponen en
-               transparentes.
-               El width del borde que se ve determina el alto, mientras que la suma de los dos laterales 
-               determinan el ancho de la base.
-            */
-            .arrow-up {
                 
-                border-left: 8px solid transparent;
-                border-right: 8px solid transparent;
-
-                border-bottom: 8px solid #fff;
+                top: 10px;
+                width: 8px; 
+                height: 8px; 
+                
+                background-color: #fff;
+                border: 1px solid #bbb;
+                left: -11px;
             }
 
+            
+            .arrow-up {
+                clip-path: polygon(50% 0, 0 100%, 100% 100%);
+                border-bottom: 1px solid transparent #fff;
+            }
+            
             .arrow-down {
-                width: 0; 
-                height: 0; 
-                border-left: 8px solid transparent;
-                border-right: 8px solid transparent;
-
-                border-top: 8px solid #fff;
+                clip-path: polygon(0 0, 50% 100%, 100% 0);
             }
-
+            
             .arrow-right {
-                width: 0; 
-                height: 0; 
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-
-                border-left: 8px solid #fff;
+                clip-path: polygon(0 0, 0 100%, 100% 50%);
             }
-
+            
             .arrow-left {
-                width: 0; 
+                /*
+                las posiciones son en % horizontal y vertical dentro del recuadro del 
+                div. Así, 100% 0, representa que se mueve a la esquina superior derecha.
+                */
+                clip-path: polygon(100% 0, 0 50%, 100% 100%);
+                
+                border-right: 2px solid #fff;
+/*                width: 0; 
                 height: 0;
-                left: -16px;
+                
                 border-top: 8px solid transparent;
                 border-bottom: 8px solid transparent; 
                 
-                border-right: 20px solid #fff; 
+                border-right: 20px solid #fff; */
             }
 
 
@@ -129,12 +121,16 @@
                 this.$server.targetPosition(rect.top, rect.right, rect.bottom, rect.left);
             }
 
-            hideTimeout(bubble, timeout) {
+            hideTimeout(bubble,timeout) {
                 setTimeout(function () {
-                    bubble.classList.remove("active");
-                }, 10000);
+                   bubble.classList.remove("active");
+                }, timeout);
             }
-
+            
+            hide() {
+                bubble.classList.remove("active");
+            }
+            
         }
 
         window.customElements.define(BubbleDialog.is, BubbleDialog);
