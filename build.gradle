@@ -156,7 +156,7 @@ jar {
             "Vaadin-Package-Version": "1",
             "Vaadin-Addon": "bubbledialog-"+version+".jar",
             "Implementation-Vendor": "MarceloDRe",
-            "Implementation-Title": "BubbleDialog component for Vaadin Flow 14.+",
+            "Implementation-Title": "BubbleDialog component for Vaadin Flow 13.+",
             "Implementation-Version": "$version"
       
         )
@@ -222,7 +222,7 @@ task createVaadinDirectoryRelease(type: Zip) {
         vdManifest << "Vaadin-Package-Version: 1\n"
         vdManifest << "Vaadin-Addon: bubbledialog-"+version+".jar\n"
         vdManifest << "Implementation-Vendor: MarceloDRe \n"
-        vdManifest << "Implementation-Title: BubbleDialog component for Vaadin Flow 14.+\n"
+        vdManifest << "Implementation-Title: BubbleDialog component for Vaadin Flow 13.+\n"
         vdManifest << "Implementation-Version: "+version+"\n"
         
         // copiar los archivos al directorio
@@ -303,10 +303,10 @@ uploadArchives {
             
             
             pom.project {
-                name 'BubbleDialog component for Vaadin Flow 14.+'
+                name 'BubbleDialog component for Vaadin Flow 13.+'
                 packaging 'jar'
                 // optionally artifactId can be defined here 
-                description 'BubbleDialog for Vaadin Flow 14.+.'
+                description 'BubbleDialog for Vaadin Flow 13.+.'
                 url 'https://github.com/mdre/bubbledialog'
 
                 scm {
