@@ -33,7 +33,7 @@ idea{
 }
 
 vaadin {
-    version '13.0.+'          // Vaadin version to use
+    version '13.0.3'        // Vaadin version to use
     productionMode false    // Is the component built for production use
 }
 
