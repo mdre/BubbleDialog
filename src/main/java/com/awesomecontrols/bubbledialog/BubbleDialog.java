@@ -58,13 +58,13 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     
     
     public enum Align {
-        TOP_RIGHT,
-        BOTTOM_RIGHT,
-        BOTTOM_LEFT,
-        TOP_LEFT
+        RIGHT,
+        BOTTOM,
+        UP,
+        LEFT
     }
     
-    Align alignTo = Align.TOP_RIGHT;
+    Align alignTo = Align.RIGHT;
     
     int x_offset = 0;
     int y_offset = 0;
@@ -80,8 +80,6 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      */
     Component content;
     
-    // overlay utilziado para mostrar el BubbleDialog
-    BubbleDialogOverlay overlay;
     
     /**
      * Create a bubbleContent near to the target component
@@ -92,13 +90,11 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         this.targetId = target;
         
         
-        overlay = new BubbleDialogOverlay();
         this.content = content;
         
         this.bubbleContent.removeAll();
         this.bubbleContent.add(this.content);
         
-        this.overlay.addComponent(this);
     }
     
     
@@ -169,7 +165,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         double popupLeft = right;
         
         switch (this.alignTo) {
-            case TOP_RIGHT:
+            case RIGHT:
                 popupTop = top + this.y_offset;
                 popupLeft = right + this.x_offset + this.arrowLength;
                 this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top;
@@ -184,17 +180,21 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
                 
                 break;
                 
-            case BOTTOM_RIGHT:
+            case BOTTOM:
                 popupTop = bottom + this.y_offset;
                 popupLeft = right + this.x_offset + this.arrowLength;
+                
+                
+                
                 break;
                 
-            case BOTTOM_LEFT:
+            case LEFT:
                 popupTop = bottom + this.y_offset;
                 popupLeft = left + this.x_offset;
+                
                 break;
                 
-            case TOP_LEFT:
+            case UP:
                 popupTop = top + this.y_offset;
                 popupLeft = left + this.x_offset;
                 break;
@@ -242,7 +242,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      * @param align enum with the available target aligns
      * @return this
      */
-    public BubbleDialog setAlign(Align align) {
+    private BubbleDialog setAlign(Align align) {
         this.alignTo = align;
         return this;
     }
