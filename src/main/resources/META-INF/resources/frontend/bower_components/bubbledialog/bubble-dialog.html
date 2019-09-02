@@ -62,9 +62,10 @@
                 las posiciones son en % horizontal y vertical dentro del recuadro del 
                 div. Así, 100% 0, representa que se mueve a la esquina superior derecha.
                 */
-                clip-path: polygon(100% 0, 0 50%, 100% 100%);
+                clip-path: polygon(100% 0, 0 0 , 100% 100%);
                 
                 border-right: 2px solid #fff;
+                background: #bbb;
 /*                width: 0; 
                 height: 0;
                 
@@ -74,12 +75,23 @@
                 border-right: 20px solid #fff; */
             }
 
-
+            .arrow-inside {
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                right: -3px;
+                clip-path: polygon(100% 0, 0 0 , 100% 100%);
+                background: #fff;
+            }
+            
         </style> 
 
         <div id="bubble" class="bubble active">
             <div id="bubble-content"></div>
-            <div id="bubble-arrow" class="bubble-arrow arrow-left"></div>
+            <div id="bubble-arrow" class="bubble-arrow arrow-left">
+                <div id="bubble-arrow-inside" class="arrow-inside"></div>
+            </div>
         </div>
     </template>
 
