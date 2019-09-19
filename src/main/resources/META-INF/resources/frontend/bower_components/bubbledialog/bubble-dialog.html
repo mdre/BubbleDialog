@@ -3,7 +3,7 @@
 
 <dom-module id="bubble-dialog">
     <template>
-        <style>
+        <style include="bubble-dialog-custom">
             /* BUBBLE */
             .bubble {
                 box-shadow: 0 1px 3px rgba(black,.2);
@@ -21,6 +21,7 @@
                 -o-transition: all 0.218s;
                 -webkit-transition: all 0.218s;
                 transition: all 0.218s;
+                
             }
 
             .bubble.active {
@@ -38,14 +39,26 @@
                 
                 background-color: #fff;
                 border: 1px solid #bbb;
-                left: -11px;
             }
 
             
             .arrow-up {
+                
                 clip-path: polygon(50% 0, 0 100%, 100% 100%);
                 border-bottom: 2px solid transparent #fff;
+                background: #bbb;
             }
+            
+            .arrow-up-inside {
+                position: absolute;
+                top: -0px;
+                bottom: -3px;
+                left: 0px;
+                right: 0px;
+                clip-path: polygon(50% 0, 0 100% , 100% 100%);
+                background: #fff;
+            }
+            
             
             .arrow-down {
                 clip-path: polygon(0 0, 50% 100%, 100% 0);
@@ -75,7 +88,7 @@
                 border-right: 20px solid #fff; */
             }
 
-            .arrow-inside {
+            .arrow-left-inside {
                 position: absolute;
                 top: 0px;
                 bottom: 0px;
@@ -85,12 +98,18 @@
                 background: #fff;
             }
             
+            .bubble-content {
+                overflow: auto;
+                width: inherit;
+                height: inherit;
+            }
+            
         </style> 
 
         <div id="bubble" class="bubble active">
-            <div id="bubble-content"></div>
-            <div id="bubble-arrow" class="bubble-arrow arrow-left">
-                <div id="bubble-arrow-inside" class="arrow-inside"></div>
+            <div id="bubble-content" class="bubble-content"></div>
+            <div id="bubble-arrow" class="bubble-arrow">
+                <div id="bubble-arrow-inside" class=""></div>
             </div>
         </div>
     </template>

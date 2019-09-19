@@ -3,7 +3,6 @@ package com.awesomecontrols.bubbledialog;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.HasTheme;
 import com.vaadin.flow.component.Tag;
@@ -12,6 +11,7 @@ import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.dom.ClassList;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.Style;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 @Tag("bubble-dialog")
 //@StyleSheet("frontend://bower_components/bubbledialog/cards.css")
 @HtmlImport("bower_components/bubbledialog/bubble-dialog.html")
-public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements  HasSize, HasTheme, HasStyle, HasComponents {
+public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements  HasTheme, HasStyle, HasComponents {
 
     private final static Logger LOGGER = Logger.getLogger(BubbleDialog.class .getName());
     static {
@@ -39,14 +39,23 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     @Id("bubble-arrow")
     Div bubbleArrow;
     
+    @Id("bubble-arrow-inside")
+    Div bubbleArrowInside;
+    
     double top;
     double left;
+    double height;
+    double width;
     
     int bubblePadding = 2;
     
     int timeout;
     
-    int arrowLength = 8;
+    int arrowRightLength = 8;  // arrow size when bubble open to the rigth 
+    int arrowLeftLength = 8;   // arrow size when bubble open to the left
+    int arrowBottomLength = 8; // arrow size when bubble open to the bottom
+    int arrowTopLength = 8;    // // arrow size when bubble open to the top
+    
     int arrowBaseWidth = 8;
     double targetMiddle;
     
@@ -55,16 +64,20 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     
     
     Element targetId;
+    private String sHeight;
+    private String sWidth;
     
     
     public enum Align {
-        RIGHT,
-        BOTTOM,
-        UP,
-        LEFT
+        TOP_RIGHT,
+        BOTTOM_RIGHT,
+        BOTTOM_LEFT,
+        UP_RIGHT,
+        UP_LEFT,
+        TOP_LEFT
     }
     
-    Align alignTo = Align.RIGHT;
+    Align alignTo = Align.TOP_RIGHT;
     
     int x_offset = 0;
     int y_offset = 0;
@@ -157,6 +170,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         }
     }
     
+    
     @ClientCallable
     private void targetPosition(double top, double right, double bottom, double left) {
         LOGGER.log(Level.FINER, "top: "+top+" right: "+right+" bottom: "+bottom+" left: "+left);
@@ -164,37 +178,59 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         double popupTop = top;
         double popupLeft = right;
         
+        // quitar las referencias del arrow existente.
+        bubbleArrow.removeClassName("arrow-up");
+        bubbleArrow.removeClassName("arrow-down");
+        bubbleArrow.removeClassName("arrow-left");
+        bubbleArrow.removeClassName("arrow-right");
+        
+        
         switch (this.alignTo) {
-            case RIGHT:
+            case TOP_RIGHT:
                 popupTop = top + this.y_offset;
-                popupLeft = right + this.x_offset + this.arrowLength;
+                popupLeft = right + this.x_offset + this.arrowRightLength;
                 this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top;
                 
                 this.arrowHeight = this.arrowBaseWidth;
-                this.arrowWidth = this.arrowLength;
+                this.arrowWidth = this.arrowRightLength;
                 
-                bubbleArrow.getStyle().set("left","-"+(arrowLength+bubblePadding+1)+"px");
+                bubbleArrow.setClassName("bubble-arrow arrow-left");
+                bubbleArrowInside.setClassName("arrow-left-inside");
+                
+                bubbleArrow.getStyle().set("left","-"+(arrowRightLength+bubblePadding+1)+"px");
                 bubbleArrow.getStyle().set("top",""+targetMiddle+"px");
                 bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
                 bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
                 
                 break;
                 
-            case BOTTOM:
-                popupTop = bottom + this.y_offset;
-                popupLeft = right + this.x_offset + this.arrowLength;
+            case BOTTOM_RIGHT:
+                popupTop = bottom + this.y_offset + this.arrowBottomLength;
+                popupLeft = right - this.x_offset - this.width;
                 
+                this.targetMiddle = (left + right)/2 - this.arrowBaseWidth/2 - left;
+                
+                this.arrowHeight = this.arrowBottomLength;
+                this.arrowWidth = this.arrowBaseWidth;
+                
+                bubbleArrow.setClassName("bubble-arrow arrow-up");
+                bubbleArrowInside.setClassName("arrow-up-inside");
+                
+                bubbleArrow.getStyle().set("right","8px");
+                bubbleArrow.getStyle().set("top","-"+ (this.arrowBottomLength+2) +"px");
+                bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
+                bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
                 
                 
                 break;
                 
-            case LEFT:
+            case TOP_LEFT:
                 popupTop = bottom + this.y_offset;
                 popupLeft = left + this.x_offset;
                 
                 break;
                 
-            case UP:
+            case UP_RIGHT:
                 popupTop = top + this.y_offset;
                 popupLeft = left + this.x_offset;
                 break;
@@ -242,7 +278,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
      * @param align enum with the available target aligns
      * @return this
      */
-    private BubbleDialog setAlign(Align align) {
+    public BubbleDialog setAlign(Align align) {
         this.alignTo = align;
         return this;
     }
@@ -273,11 +309,65 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     }
 
     public int getArrowLength() {
-        return arrowLength;
+        int len = 8;
+        switch(this.alignTo) {
+            case TOP_RIGHT:
+                len = arrowRightLength;
+            case BOTTOM_RIGHT:
+            case BOTTOM_LEFT:
+                len = arrowBottomLength;
+                break;
+            case TOP_LEFT:
+                len = arrowLeftLength;
+            case UP_LEFT:
+            case UP_RIGHT:
+                len = arrowTopLength;
+        }
+        return len;
     }
 
-    public BubbleDialog setArrowLength(int arrowLength) {
-        this.arrowLength = arrowLength;
+    /**
+     * Set the lenght of the arrow when the bubble is aligned
+     * to the right of the target component.
+     * The arrown point to the left: <
+     * @param arrowLength
+     * @return 
+     */
+    public BubbleDialog setArrowRightLength(int arrowLength) {
+        this.arrowRightLength = arrowLength;
+        return this;
+    }
+    /**
+     * Set the lenght of the arrow when the bubble is aligned
+     * bellow the target component.
+     * The arrow point to up: ^
+     * @param arrowLength
+     * @return 
+     */
+    public BubbleDialog setArrowBottomLength(int arrowLength) {
+        this.arrowBottomLength = arrowLength;
+        return this;
+    }
+    /**
+     * Set the lenght of the arrow when the bubble is aligned
+     * to the left of the target component.
+     * * The arrow point to the right: ->
+     * @param arrowLength
+     * @return 
+     */
+    public BubbleDialog setArrowLeftLength(int arrowLength) {
+        this.arrowLeftLength = arrowLength;
+        return this;
+    }
+    /**
+     * Set the lenght of the arrow when the bubble is aligned
+     * above the target component.
+     * * The arrow point to down: v
+     * @param arrowLength
+     * @return 
+     */
+    public BubbleDialog setArrowTopLength(int arrowLength) {
+        this.arrowTopLength = arrowLength;
         return this;
     }
 
@@ -294,6 +384,84 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     public Style getStyle() {
         return bubbleContent.getStyle();
     }
+    
+    public double getHeight() {
+        return this.height;
+    }
+
+    public BubbleDialog setHeight(double h) {
+        this.height = h;
+        this.bubble.getStyle().set("height", height+"px");
+        return this;
+    }
+    
+    /**
+     * Set the height in pixels
+     * @param h is the height in pixels
+     */
+    public BubbleDialog setHeight(int h) {
+        this.bubble.getStyle().set("height", h+"px");
+        return this;
+    }
+
+    public double getWidth() {
+        return this.width;
+    }
+
+    public BubbleDialog setWidth(double w) {
+        this.width = w;
+        this.bubble.getStyle().set("width", w+"px");
+        return this;
+    }
+    
+
+    @Override
+    public void removeClassNames(String... classNames) {
+        this.bubble.removeClassNames(classNames); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void addClassNames(String... classNames) {
+        this.bubble.addClassNames(classNames); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean hasClassName(String className) {
+        return this.bubble.hasClassName(className); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setClassName(String className, boolean set) {
+        this.bubble.setClassName(className, set); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public ClassList getClassNames() {
+        return this.bubble.getClassNames(); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getClassName() {
+        return this.bubble.getClassName(); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setClassName(String className) {
+        this.bubble.setClassName(className); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean removeClassName(String className) {
+        return this.bubble.removeClassName(className); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void addClassName(String className) {
+        this.bubble.addClassName(className); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    
     
     /**
      * Add a visibility change listener.
