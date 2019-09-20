@@ -58,6 +58,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     
     int arrowBaseWidth = 8;
     double targetMiddle;
+    int arrowOffset = 0;
     
     int arrowWidth = 8;
     int arrowHeight = 8;
@@ -184,12 +185,19 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         bubbleArrow.removeClassName("arrow-left");
         bubbleArrow.removeClassName("arrow-right");
         
+        // limpiar el posicionamiento
+        bubbleArrow.getStyle().remove("left");
+        bubbleArrow.getStyle().remove("right");
+        bubbleArrow.getStyle().remove("top");
+        bubbleArrow.getStyle().remove("bottom");
+        bubbleArrow.getStyle().remove("height");
+        bubbleArrow.getStyle().remove("width");
         
         switch (this.alignTo) {
             case TOP_RIGHT:
                 popupTop = top + this.y_offset;
                 popupLeft = right + this.x_offset + this.arrowRightLength;
-                this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top;
+                this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top + arrowOffset;
                 
                 this.arrowHeight = this.arrowBaseWidth;
                 this.arrowWidth = this.arrowRightLength;
@@ -216,7 +224,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
                 bubbleArrow.setClassName("bubble-arrow arrow-up");
                 bubbleArrowInside.setClassName("arrow-up-inside");
                 
-                bubbleArrow.getStyle().set("right","8px");
+                bubbleArrow.getStyle().set("right",(8+arrowOffset)+"px");
                 bubbleArrow.getStyle().set("top","-"+ (this.arrowBottomLength+2) +"px");
                 bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
                 bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
@@ -244,6 +252,16 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         if (this.timeout>0) {
             getElement().callFunction("hideTimeout",this.bubble,this.timeout);
         }
+    }
+    
+    /**
+     * Set the offset of the arrow.
+     * @param o
+     * @return 
+     */
+    public BubbleDialog setArrowOffset(int o) {
+        this.arrowOffset = o;
+        return this;
     }
     
     private void setPosition(double top, double left) {
