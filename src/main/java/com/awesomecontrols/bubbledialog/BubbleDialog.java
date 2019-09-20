@@ -193,6 +193,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         bubbleArrow.getStyle().remove("height");
         bubbleArrow.getStyle().remove("width");
         
+        LOGGER.log(Level.FINER, "current align: "+this.alignTo);
         switch (this.alignTo) {
             case TOP_RIGHT:
                 popupTop = top + this.y_offset;
@@ -252,6 +253,14 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         if (this.timeout>0) {
             getElement().callFunction("hideTimeout",this.bubble,this.timeout);
         }
+    }
+    
+    /**
+     * Return the current align.
+     * @return align
+     */
+    public Align getAlign() {
+        return this.alignTo;
     }
     
     /**
