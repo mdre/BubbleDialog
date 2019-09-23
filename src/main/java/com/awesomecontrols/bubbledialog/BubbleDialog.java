@@ -65,9 +65,6 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     
     
     Element targetId;
-    private String sHeight;
-    private String sWidth;
-    
     
     public enum Align {
         TOP_RIGHT,
@@ -175,6 +172,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     @ClientCallable
     private void targetPosition(double top, double right, double bottom, double left) {
         LOGGER.log(Level.FINER, "top: "+top+" right: "+right+" bottom: "+bottom+" left: "+left);
+        LOGGER.log(Level.FINER, "bundle width: "+this.width+" height: "+this.height);
         // agregar el overlay
         double popupTop = top;
         double popupLeft = right;
@@ -197,7 +195,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         switch (this.alignTo) {
             case TOP_RIGHT:
                 popupTop = top + this.y_offset;
-                popupLeft = right + this.x_offset + this.arrowRightLength;
+                popupLeft = right + this.x_offset + this.arrowRightLength + (bubblePadding*2);
                 this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top + arrowOffset;
                 
                 this.arrowHeight = this.arrowBaseWidth;
@@ -215,7 +213,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
                 
             case BOTTOM_RIGHT:
                 popupTop = bottom + this.y_offset + this.arrowBottomLength;
-                popupLeft = right - this.x_offset - this.width;
+                popupLeft = right + this.x_offset - this.width;
                 
                 this.targetMiddle = (left + right)/2 - this.arrowBaseWidth/2 - left;
                 
@@ -233,16 +231,83 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
                 
                 break;
                 
-            case TOP_LEFT:
-                popupTop = bottom + this.y_offset;
+            case BOTTOM_LEFT:
+                popupTop = bottom + this.y_offset + this.arrowBottomLength;
                 popupLeft = left + this.x_offset;
                 
+                this.targetMiddle = (left + right)/2 - this.arrowBaseWidth/2 - left;
+                
+                this.arrowHeight = this.arrowBottomLength;
+                this.arrowWidth = this.arrowBaseWidth;
+                
+                bubbleArrow.setClassName("bubble-arrow arrow-up");
+                bubbleArrowInside.setClassName("arrow-up-inside");
+                
+                bubbleArrow.getStyle().set("left",(8+arrowOffset)+"px");
+                bubbleArrow.getStyle().set("top","-"+ (this.arrowBottomLength+2) +"px");
+                bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
+                bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
+                break;
+                
+            case TOP_LEFT:
+                popupTop = top + this.y_offset;
+                popupLeft = left + this.x_offset - this.arrowRightLength - (bubblePadding*2) - this.width;
+                
+                this.targetMiddle = (top + bottom)/2 - this.arrowBaseWidth/2 - top + arrowOffset;
+                
+                this.arrowHeight = this.arrowBaseWidth;
+                this.arrowWidth = this.arrowRightLength;
+                
+                bubbleArrow.setClassName("bubble-arrow arrow-right");
+                bubbleArrowInside.setClassName("arrow-right-inside");
+                
+                bubbleArrow.getStyle().set("right","-"+(arrowRightLength+(bubblePadding*2)-1)+"px");
+                bubbleArrow.getStyle().set("top",""+targetMiddle+"px");
+                bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
+                bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
+                
+                break;
+                
+            case UP_LEFT: 
+                popupTop = top + this.y_offset - this.arrowTopLength - this.height - (bubblePadding*2);
+                popupLeft = left + this.x_offset;
+                LOGGER.log(Level.FINER, "height: "+this.height+" arrowTopLength: "+this.arrowTopLength);
+                LOGGER.log(Level.FINER, "Bubble top: "+popupTop+" left: "+popupLeft);
+                
+                this.targetMiddle = (left + right)/2 - this.arrowBaseWidth/2 - left;
+                
+                this.arrowHeight = this.arrowBottomLength;
+                this.arrowWidth = this.arrowBaseWidth;
+                
+                bubbleArrow.setClassName("bubble-arrow arrow-down");
+                bubbleArrowInside.setClassName("arrow-down-inside");
+                
+                bubbleArrow.getStyle().set("left",(8+arrowOffset)+"px");
+                bubbleArrow.getStyle().set("bottom","-"+ (this.arrowBottomLength+1) +"px");
+                bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
+                bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
                 break;
                 
             case UP_RIGHT:
-                popupTop = top + this.y_offset;
-                popupLeft = left + this.x_offset;
+                popupTop = top + this.y_offset - this.arrowTopLength - this.height - (bubblePadding*2);
+                popupLeft = right + this.x_offset - this.width;
+                LOGGER.log(Level.FINER, "height: "+this.height+" arrowTopLength: "+this.arrowTopLength);
+                LOGGER.log(Level.FINER, "Bubble top: "+popupTop+" left: "+popupLeft);
+                
+                this.targetMiddle = (left + right)/2 - this.arrowBaseWidth/2 - left;
+                
+                this.arrowHeight = this.arrowBottomLength;
+                this.arrowWidth = this.arrowBaseWidth;
+                
+                bubbleArrow.setClassName("bubble-arrow arrow-down");
+                bubbleArrowInside.setClassName("arrow-down-inside");
+                
+                bubbleArrow.getStyle().set("right",(8+arrowOffset)+"px");
+                bubbleArrow.getStyle().set("bottom","-"+ (this.arrowBottomLength+1) +"px");
+                bubbleArrow.getStyle().set("width",""+arrowWidth+"px");
+                bubbleArrow.getStyle().set("height",""+arrowHeight+"px");
                 break;
+                
         }
         
         
@@ -356,7 +421,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     /**
      * Set the lenght of the arrow when the bubble is aligned
      * to the right of the target component.
-     * The arrown point to the left: <
+     * The arrown point to the left.
      * @param arrowLength
      * @return 
      */
@@ -367,7 +432,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     /**
      * Set the lenght of the arrow when the bubble is aligned
      * bellow the target component.
-     * The arrow point to up: ^
+     * The arrow point to up.
      * @param arrowLength
      * @return 
      */
@@ -378,7 +443,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     /**
      * Set the lenght of the arrow when the bubble is aligned
      * to the left of the target component.
-     * * The arrow point to the right: ->
+     * * The arrow point to the right.
      * @param arrowLength
      * @return 
      */
@@ -389,7 +454,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
     /**
      * Set the lenght of the arrow when the bubble is aligned
      * above the target component.
-     * * The arrow point to down: v
+     * * The arrow point to down.
      * @param arrowLength
      * @return 
      */
@@ -422,15 +487,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         return this;
     }
     
-    /**
-     * Set the height in pixels
-     * @param h is the height in pixels
-     */
-    public BubbleDialog setHeight(int h) {
-        this.bubble.getStyle().set("height", h+"px");
-        return this;
-    }
-
+    
     public double getWidth() {
         return this.width;
     }

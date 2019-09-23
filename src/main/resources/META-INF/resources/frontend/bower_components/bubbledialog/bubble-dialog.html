@@ -29,11 +29,11 @@
                 opacity: 1;
             }
 
+            
             /* bubble arrow */
             .bubble-arrow {
                 position: absolute;
                 
-                top: 10px;
                 width: 8px; 
                 height: 8px; 
                 
@@ -41,7 +41,9 @@
                 border: 1px solid #bbb;
             }
 
-            
+
+
+            /*-------------------------------------------------*/
             .arrow-up {
                 
                 clip-path: polygon(50% 0, 0 100%, 100% 100%);
@@ -58,18 +60,27 @@
                 clip-path: polygon(50% 0, 0 100% , 100% 100%);
                 background: #fff;
             }
+            /*-------------------------------------------------*/
             
-            
-            .arrow-down {
-                clip-path: polygon(0 0, 50% 100%, 100% 0);
-                border-top: 2px solid #fff;
-            }
-            
+            /*-------------------------------------------------*/
             .arrow-right {
-                clip-path: polygon(0 0, 0 100%, 100% 50%);
-                border-left: 2px solid #fff;
+                clip-path: polygon(0 0, 0% 100%, 100% 0);
+                border-right: 2px solid #bbb;
+                background: #bbb;
             }
             
+            .arrow-right-inside {
+                position: absolute;
+                top: 0px;
+                bottom: -1px;
+                left: -3px;
+                right: 1px;
+                clip-path: polygon(0 0, 0% 100%, 100% 0);
+                background: #fff;
+            }
+            /*-------------------------------------------------*/
+            
+            /*-------------------------------------------------*/
             .arrow-left {
                 /*
                 las posiciones son en % horizontal y vertical dentro del recuadro del 
@@ -97,6 +108,25 @@
                 clip-path: polygon(100% 0, 0 0 , 100% 100%);
                 background: #fff;
             }
+            /*-------------------------------------------------*/
+            
+            /*-------------------------------------------------*/
+            .arrow-down {
+                clip-path: polygon(0 0, 50% 100%, 100% 0);
+                border-top: 2px solid #fff;
+                background: #bbb;
+            }
+            
+            .arrow-down-inside {
+                position: absolute;
+                top: -2px;
+                bottom: 0px;
+                left: 1px;
+                right: 1px;
+                clip-path: polygon(0 0, 50% 100%, 100% 0);
+                background: #fff;
+            }
+            /*-------------------------------------------------*/
             
             .bubble-content {
                 overflow: auto;
@@ -152,6 +182,10 @@
                 console.log(rect.top, rect.right, rect.bottom, rect.left);
 
                 this.$server.targetPosition(rect.top, rect.right, rect.bottom, rect.left);
+            }
+            
+            guessSize(targetid) {
+                
             }
 
             hideTimeout(bubble,timeout) {
