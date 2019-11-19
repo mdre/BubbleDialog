@@ -10,3 +10,4 @@ rebel.xml
 .*
 !.gitignore
 /toVaadinDirectory/
+node_modules
