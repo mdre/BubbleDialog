@@ -130,16 +130,6 @@
         </dependency>
     </dependencies>
 
-    <pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-            </plugin>
-        </plugins>
-    </pluginManagement>
-
     <build>
         <defaultGoal>jetty:run</defaultGoal>
         <plugins>
@@ -173,6 +163,7 @@
                 <configuration>
                     <tagNameFormat>@{version}</tagNameFormat>
                 </configuration>
+                <releaseProfiles>release</releaseProfiles>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -444,6 +435,29 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <use>false</use>
+                                    <use>false</use>
+                                    <source>1.8</source>
+                                    <links>
+                                        <link>http://docs.oracle.com/javase/7/docs/api/</link>
+                                        <link>http://docs.oracle.com/javase/7/docs/api/</link>
+                                    </links>
+                                    <doclint>none</doclint>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
