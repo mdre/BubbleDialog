@@ -4,7 +4,7 @@
 
     <groupId>com.github.mdre</groupId>
     <artifactId>bubbledialog</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
     <name>bubbledialog</name>
     <description>BubbleDialog component for Vaadin Flow 14.+</description>
 
@@ -35,7 +35,7 @@
         <connection>scm:git:ssh://git@github.com/mdre/BubbleDialog.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/mdre/BubbleDialog.git</developerConnection>
         <url>https://github.com/mdre/BubbleDialog</url>
-        <tag>1.0.0</tag>
+        <tag>0.9.0</tag>
     </scm>
 
     <dependencyManagement>
