@@ -1,5 +1,5 @@
 # BubbleDialog
-BubbleDialog compoment for Vaadin Flow 10+  
+BubbleDialog compoment for Vaadin Flow 14.+  
 
 Show a bubble dialog near to the target component.
 
@@ -20,5 +20,3 @@ bd = new BubbleDialog(btn.getElement(), lyBubble).setArrowLength(55).setTimeout(
 
 ```
 
-TODO:
-- Let the bubble align left, top, bottom.
