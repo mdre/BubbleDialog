@@ -1,0 +1,2 @@
+rootProject.name = 'bubbledialog'
+enableFeaturePreview('IMPROVED_POM_SUPPORT')

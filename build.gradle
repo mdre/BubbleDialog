@@ -1,0 +1,365 @@
+// los recursos se deben agregar en /src/main/resources/META-INF/resources/frontend/...
+// https://vaadin.com/blog/vaadin-10-and-static-resources
+
+plugins {
+    id 'java'
+    id 'org.gretty' version '2.3.0'
+    id 'net.researchgate.release' version '2.8.1'
+    id 'nu.studer.credentials' version '1.0.7'
+    id 'io.codearte.nexus-staging' version '0.21.1'
+    id "com.github.dkorotych.gradle-maven-exec" version "2.2.1"
+}
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def sonatypeUser = credentials.sonatypeUser
+def sonatypePassword = credentials.sonatypePassword
+
+description = rootProject.name
+
+// ejecutar: gradle idea 
+// para que inicialize el proyecto y baje los javadocs.
+apply plugin: 'idea'
+idea{
+    module{
+        downloadJavadoc=true
+    }
+}
+
+// desactivo la generación de javadoc en los proyectos que tengan la tarea
+javadoc.enabled = true
+
+println "***************************************************************"
+println "SISTEMA: " + name
+println "VERSION: " + version
+println "***************************************************************"
+import java.text.SimpleDateFormat
+def getCurrentTimestamp ()
+{
+    Date today = new Date ()
+    SimpleDateFormat df = new SimpleDateFormat ("dd/MM/yyyy hh:mm:ss")
+    return df.format (today)
+}
+
+println getCurrentTimestamp()
+println "---------------------------------------------------------------"
+// incrementar automáticamente el buildNumber
+task autoBuildNumber {
+    doFirst {
+        File propertiesFile = new File('gradle.properties')
+        def lines = propertiesFile.readLines()
+
+        PrintWriter printWriter = new PrintWriter(propertiesFile)
+        
+        lines.each {String line ->
+            if (line.startsWith("version") ){
+                String versionNumber = line.tokenize("=")[1]
+                String[] versionParts = versionNumber.tokenize(".")
+                // recalcular el build 
+                versionNumber = versionParts[0]+\
+                                '.'+versionParts[1]+\
+                                '.'+versionParts[2]+
+                                '.'+( versionParts.length==4 ? (versionParts[3].toInteger()+1).toString():"1")
+                
+                line = "version="+versionNumber
+                //                println line
+            }
+            printWriter.println(line)
+        }
+        printWriter.close()
+    }
+}
+// saltar autoBuildNumber
+// agregar esta tarea para que no se incremente el valor.
+task sabn{}
+
+task createMavenPom {
+    pom {}.writeTo("target/classes/META-INF/maven/$project.group/$project.archivesBaseName/pom.xml")
+
+    File pomProperties = new File("target/classes/META-INF/maven/$project.group/$project.archivesBaseName/pom.properties")
+    pomProperties.write("version=$project.version\n")
+    pomProperties << "groupId=$project.group\n"
+    pomProperties << "artifactId=$project.archivesBaseName\n"
+
+}
+
+// invocar el prepare-frontend de maven
+task prepareFrontEnd (type: MavenExec, dependsOn: build) {
+    goals 'vaadin:prepare-frontend'
+}
+
+task buildFrontEnd (type: MavenExec, dependsOn: prepareFrontEnd) {
+    goals 'vaadin:build-frontend'
+}
+
+// agregar la dependencia solo si no se trata de un release
+if (! (project.gradle.startParameter.taskNames.join(",").toLowerCase().contains("release")
+       || project.gradle.startParameter.taskNames.join(",").toLowerCase().contains("sabn")) 
+   ) {
+    build.dependsOn autoBuildNumber 
+}
+
+build.doLast {
+    println "build.doLast"
+
+    // copiar las clases compiladas
+    copy {
+        from "build/classes/java/main/."
+        into "target/classes"
+    }
+
+    //prepareFrontEnd.execute()
+    //buildFrontEnd.execute()
+
+    println "***************************************************************"
+    println "SISTEMA: " + name
+    println "VERSION: " + version
+    println "***************************************************************"
+}
+
+task vaadinBuild (dependsOn: buildFrontEnd){
+    println "***************************************************************"
+    println "Building Vaadin project: " + name
+    println "VERSION: " + version
+    println "***************************************************************"
+    
+}
+
+
+repositories {
+    mavenLocal()
+    // vaadin.repositories()
+    maven {
+        url "https://mvnrepository.com/artifact/com.vaadin/vaadin"
+    }
+
+    mavenCentral()
+}
+
+dependencies {
+    compile('com.vaadin:vaadin:14.0.9')
+    //compile('com.vaadin:vaadin-bom:14.0.14')
+    // compile vaadin.bom()
+    // compile vaadin.core()
+    // runtime vaadin.slf4j()
+    // compile ('org.slf4j:slf4j-simple:1.7.25:javadoc')
+    //   <configuration> vaadin.core()             // Vaadin core dependencies
+    //   <configuration> vaadin.platform()         // Vaadin platform dependencies
+    //   <configuration> vaadin.bom()              // Vaadin Bill-of-Materials dependency
+    //   <configuration> vaadin.dependency(..)     // Adds a single vaadin-* dependency
+}
+
+
+test {
+    testLogging {
+        // Make sure output from
+        // standard out or error is shown
+        // in Gradle output.
+        showStandardStreams = true
+ 
+        // Or we use events method:
+        // events 'standard_out', 'standard_error'
+ 
+        // Or set property events:
+        // events = ['standard_out', 'standard_error']
+ 
+        // Instead of string values we can
+        // use enum values:
+        // events org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+        //        org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            "Manifest-Version": "1.0",
+            "Vaadin-Package-Version": "1",
+            "Vaadin-Addon": "bubbledialog-"+version+".jar",
+            "Implementation-Vendor": "MarceloDRe",
+            "Implementation-Title": "BubbleDialog component for Vaadin Flow 14.+",
+            "Implementation-Version": "$version"
+      
+        )
+    }
+    from "$buildDir/classes/java/main"
+    
+    from ("target/classes/META-INF") {
+        into "META-INF"
+    }
+}
+
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    //    manifest {
+    //        attributes(
+    //      'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+    //      'Premain-Class':'net.odbogm.agent.TransparentDirtyDetectorAgent',
+    //      'Agent-Class':'net.odbogm.agent.TransparentDirtyDetectorAgent',
+    //      'Can-Redefine-Classes':true,
+    //      'Can-Retransform-Classes':true
+    //        )
+    //    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+//===============================================================================
+// Vaadin Directory stuff
+//===============================================================================
+ext.copyFile = {String srcF, String destF ->
+    File src = new File(srcF)
+    File dest = new File(destF)
+    if (src.isFile()) {
+        dest << src.bytes
+    } else {
+        throw new Exception("el archivo "+srcF+" no existe!")
+    }
+}
+
+task createVaadinDirectoryRelease(type: Zip) {
+    if (project.gradle.startParameter.taskNames.join(",").toLowerCase().contains("createvaadindirectoryrelease")) {
+        group = 'Welcome'
+        description = 'Crear un paquete para subir a Vaadin Directory'
+        
+        println "preparando el paquete..."
+            
+        String VAADINDIRECTORY = "toVaadinDirectory"
+        String vaadinDistDir = VAADINDIRECTORY+"/dist"
+        
+        File toVaadinDirectory = new File(VAADINDIRECTORY)
+        File fVaadinDistDir = new File(vaadinDistDir)
+        File vdMetaInf = new File(vaadinDistDir+"/META-INF")
+        // borrar cualquier referencia previa
+        if (toVaadinDirectory.isDirectory()) {
+            toVaadinDirectory.deleteDir()
+        }
+        // crear el directorio
+        toVaadinDirectory.mkdir()
+        fVaadinDistDir.mkdir()
+        vdMetaInf.mkdir()
+        
+        // crear el manifest
+        println "creando el manifest..."
+        File vdManifest = new File(vaadinDistDir+"/META-INF/MANIFEST.MF")
+        vdManifest.write("Manifest-Version: 1.0\n")
+        vdManifest << "Vaadin-Package-Version: 1\n"
+        vdManifest << "Vaadin-Addon: bubbledialog-"+version+".jar\n"
+        vdManifest << "Implementation-Vendor: MarceloDRe \n"
+        vdManifest << "Implementation-Title: BubbleDialog component for Vaadin Flow 13.+\n"
+        vdManifest << "Implementation-Version: "+version+"\n"
+        
+        // copiar los archivos al directorio
+        // requiere jar, sourceJar y javadoc y le readme.md
+        println "copiando los archivos..."
+        copyFile("build/libs/"+project.name+"-"+version+".jar", vaadinDistDir+"/"+project.name+"-"+version+".jar")
+        copyFile("build/libs/"+project.name+"-"+version+"-sources.jar", vaadinDistDir+"/"+project.name+"-"+version+"-sources.jar")
+        copyFile("build/libs/"+project.name+"-"+version+"-javadoc.jar", vaadinDistDir+"/"+project.name+"-"+version+"-javadoc.jar")
+        copyFile("./README.md", vaadinDistDir+"/README.md")
+        
+        println "comprimiendo..."
+        // crear el zip para subir
+        // parámetros específicos del task Zip
+        archiveName = project.name+"-"+version+".zip"
+        destinationDir = file(VAADINDIRECTORY)
+
+        from vaadinDistDir
+        println "finalizado."
+    }
+}
+
+
+// de acuerdo a la guía de 
+// http://central.sonatype.org/pages/gradle.html
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    //required { gradle.taskGraph.hasTask("uploadArchives")}
+    
+    //    ext."signing.keyId"= credentials.gpgKeyId
+    //    ext."signing.password"= credentials.gpgKeyPassword
+    //    ext."signing.secretKeyRingFile" = credentials.gpgKeyRingFile                
+
+    //    println ext."signing.keyId"
+    
+    sign(configurations.archives)
+}
+
+
+
+
+
+nexusStaging {
+    packageGroup = "com.github.mdre" //optional if packageGroup == project.getGroup()
+    //    stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
+}
+
+//sube a nexus
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment) 
+            }
+            
+            repository(url: "$sonatypeURLRelease") {
+                authentication(userName: credentials.sonatypeUser, password: credentials.sonatypePassword)
+            }
+            
+            snapshotRepository(url: "$sonatypeURLSnapshot") {
+                authentication(userName: credentials.sonatypeUser, password: credentials.sonatypePassword)
+            }
+            
+            pom.groupId = 'com.github.mdre'
+            pom.artifactId = 'bubbledialog'
+            
+            
+            pom.project {
+                name 'BubbleDialog component for Vaadin Flow 13.+'
+                packaging 'jar'
+                // optionally artifactId can be defined here 
+                description 'BubbleDialog for Vaadin Flow 13.+.'
+                url 'https://github.com/mdre/bubbledialog'
+
+                scm {
+                    connection 'scm:git:git://github.com/mdre/bubbledialog.git'
+                    developerConnection 'scm:git:ssh://github.com/mdre/bubbledialog.git'
+                    url 'https://github.com/mdre/bubbledialog'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'mdre'
+                        name 'Marcelo D. RE'
+                        email 'marcelo.re@gmail.com'
+                    }
+                }
+            }
+            
+        }
+    }
+}
+
+createReleaseTag.dependsOn ':uploadArchives'
