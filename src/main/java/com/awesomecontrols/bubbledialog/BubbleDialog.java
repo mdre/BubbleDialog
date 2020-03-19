@@ -136,7 +136,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         UI.getCurrent().add(this);
 
         LOGGER.log(Level.FINER, "targetId: " + this.targetId);
-        getElement().callFunction("updatePositionAndShow", this.targetId);
+        getElement().callJsFunction("updatePositionAndShow", this.targetId);
 
         this.fireVisibilityChangeEvent();
     }
@@ -311,7 +311,7 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
         this.visibilityState = true;
 
         if (this.timeout > 0) {
-            getElement().callFunction("hideTimeout", this.bubble, this.timeout);
+            getElement().callJsFunction("hideTimeout", this.bubble, this.timeout);
         }
     }
 
