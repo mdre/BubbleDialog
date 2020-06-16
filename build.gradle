@@ -1,6 +1,5 @@
 // los recursos se deben agregar en /src/main/resources/META-INF/resources/frontend/...
 // https://vaadin.com/blog/vaadin-10-and-static-resources
-
 plugins {
     id 'java'
     id 'org.gretty' version '3.0.1'
