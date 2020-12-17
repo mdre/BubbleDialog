@@ -11,7 +11,7 @@ import '@vaadin/flow-frontend/bubbledialog/bubble-dialog-css-loader.js';
  */
 class BubbleDialog extends ThemableMixin(PolymerElement) {
     static get template() {
-        return html `
+        return html`
         <style>
         </style> 
         
