@@ -1,5 +1,5 @@
 //import { registerStyles, css, unsafeCSS } from '@vaadin/vaadin-themable-mixin/register-styles.js';
-import styles from '@vaadin/flow-frontend/bubbledialog/bubble-dialog.css';
+import styles from 'bubbledialog/bubble-dialog.css';
 
 const $_documentContainer = document.createElement('template');
 

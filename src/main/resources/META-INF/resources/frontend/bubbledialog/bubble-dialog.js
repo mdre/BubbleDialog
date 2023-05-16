@@ -1,6 +1,6 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import '@vaadin/flow-frontend/bubbledialog/bubble-dialog-css-loader.js';
+import 'bubbledialog/bubble-dialog-css-loader.js';
 
 /**
  * `bubble-dialog`

@@ -1,9 +1,14 @@
 # BubbleDialog
-BubbleDialog compoment for Vaadin Flow 14.+  
+BubbleDialog compoment for Vaadin Flow 14+  
 
 Show a bubble dialog near to the target component.
 
-Example:
+## Versions
+
+* Version 0.+, 1.+ is compatible with Vaadin 14.+
+* Version 2.+ is compatible with Vaadin 23.+
+
+## Example:
 
 ```Java
 Button btn = new Button("B");

@@ -14,7 +14,7 @@ apply plugin: 'signing'
 def sonatypeUser = credentials.sonatypeUser
 def sonatypePassword = credentials.sonatypePassword
 
-def vaadinVersion = "14.1.20"
+def vaadinVersion = "23.3.12"
 
 description = rootProject.name
 
@@ -273,7 +273,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             beforeDeployment {
-                MavenDeployment deployment -> signing.signPom(deployment) 
+                MavenDeployment deployment -> signing.signPom(deployment)
             }
             
             repository(url: "$sonatypeURLRelease") {
