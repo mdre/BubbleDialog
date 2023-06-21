@@ -14,7 +14,7 @@ apply plugin: 'signing'
 def sonatypeUser = credentials.sonatypeUser
 def sonatypePassword = credentials.sonatypePassword
 
-def vaadinVersion = "23.3.12"
+def vaadinVersion = "23.3.14"
 
 description = rootProject.name
 
