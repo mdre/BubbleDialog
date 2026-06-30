@@ -1,20 +1,22 @@
-import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
-import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
-import 'bubbledialog/bubble-dialog-css-loader.js';
+import { LitElement, html, unsafeCSS } from 'lit';
+import styles from './bubble-dialog.css?inline';
 
 /**
  * `bubble-dialog`
  * A BubbleDialog element
  *
  * @customElement
- * @polymer
  */
-class BubbleDialog extends ThemableMixin(PolymerElement) {
-    static get template() {
+class BubbleDialog extends LitElement {
+
+    // Renderiza en shadow DOM (default de Lit). LitTemplate + @Id requieren que los
+    // elementos estén en el renderRoot (shadow). Un createRenderRoot() => this (light DOM)
+    // rompe el binding @Id y la inyección del tema (theme-for) en Vaadin 24/25, dejando el
+    // árbol de Flow inconsistente al adjuntar el contenido (TypeError en el renderer).
+    static styles = unsafeCSS(styles);
+
+    render() {
         return html`
-        <style>
-        </style> 
-        
         <div id="bubble" class="bubble active">
             <div id="bubble-content" class="bubble-content"></div>
             <div id="bubble-arrow" class="bubble-arrow">
@@ -65,7 +67,7 @@ class BubbleDialog extends ThemableMixin(PolymerElement) {
     }
 
     hide() {
-        bubble.classList.remove("active");
+        this.renderRoot?.querySelector('#bubble')?.classList.remove("active");
     }
 
 };

@@ -11,27 +11,26 @@ and open the template in the editor.
 /* definir bubble-dialog-custom en la app para personalizar el componente */
 /* BUBBLE */
 .bubble {
-    box-shadow: 0 1px 3px rgba(black,.2);
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.10);
     background-color: #fff;
-    border: 1px solid;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
     position: absolute;
     z-index: 1201 !important;
-    border-color: #bbb #bbb #a8a8a8;
-    padding: 2px;
+    padding: 6px;
     /*width: 255px;*/
     line-height: 17px;
-    visibility: hidden; 
+    visibility: hidden;
     opacity: 0;
-    -moz-transition: all 0.218s;
-    -o-transition: all 0.218s;
-    -webkit-transition: all 0.218s;
-    transition: all 0.218s;
-
+    transform: translateY(-4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
 .bubble.active {
     visibility: visible;
     opacity: 1;
+    transform: translateY(0);
 }
 
 
@@ -135,7 +134,9 @@ and open the template in the editor.
 /*-------------------------------------------------*/
 
 .bubble-content {
+    box-sizing: border-box;
     overflow: auto;
-    width: inherit;
+    width: 100%;
+    max-width: 100%;
     height: inherit;
 }

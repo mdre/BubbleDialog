@@ -14,16 +14,15 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.polymertemplate.Id;
-import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.littemplate.LitTemplate;
+import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.dom.ClassList;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.Style;
 
 @Tag("bubble-dialog")
-// @StyleSheet("frontend://bower_components/bubbledialog/cards.css")
 @JsModule("./bubbledialog/bubble-dialog.js")
-public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements HasTheme, HasStyle, HasComponents {
+public class BubbleDialog extends LitTemplate implements HasTheme, HasStyle, HasComponents {
 
     /**
      *
@@ -104,7 +103,17 @@ public class BubbleDialog extends PolymerTemplate<IBubbleDialogModel> implements
 
         this.bubbleContent.removeAll();
         this.bubbleContent.add(this.content);
+    }
 
+    /**
+     * Quita el bubble del UI. show() lo adjunta al root del UI y hide()
+     * solo lo oculta con CSS (barato, para uso frecuente);
+     * por eso, para que no quede huérfano, el dueño debe llamar a este método
+     * en un punto limpio (p.ej. al cerrar su padre, ANTES de removerlo), no durante el
+     * teardown/detach (eso rompe el renderer del cliente en Vaadin 24/25).
+     */
+    public void remove() {
+        this.getElement().removeFromParent();
     }
 
     /**

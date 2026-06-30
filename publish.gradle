@@ -1,0 +1,25 @@
+publishing {
+
+    publications {
+
+        lib(MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = project.artifactId
+            version = project.version
+        }
+    }
+
+    repositories {
+        maven {
+
+            name = "nexus"
+            url = uri("https://nexus2.intranet/content/repositories/releases/")
+
+            credentials {
+                username = project.findProperty("ldapUser")
+                password = project.findProperty("ldapPass")
+            }
+        }
+    }
+}
