@@ -17,7 +17,11 @@ and open the template in the editor.
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 10px;
     position: absolute;
-    z-index: 1201 !important;
+    /* Configurable desde la app vía custom property (las custom properties cruzan el
+       shadow boundary). Default por encima del overlay del QuickPopup (10000) y del
+       subwindow-desktop (9999) para que los bubbles de ayuda pinten siempre arriba.
+       Se puede bajar por instancia: host.getStyle().set("--bubble-dialog-z-index", "..."). */
+    z-index: var(--bubble-dialog-z-index, 20000) !important;
     padding: 6px;
     /*width: 255px;*/
     line-height: 17px;
